@@ -64,6 +64,12 @@ class AuthorizationRequest
      */
     protected $state;
 
+
+    protected $redirect;
+
+
+    protected $uuid;
+
     /**
      * The code challenge (if provided)
      *
@@ -188,6 +194,38 @@ class AuthorizationRequest
     public function setState($state)
     {
         $this->state = $state;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setRedirect($redirect)
+    {
+        $this->redirect = $redirect;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUUID()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setUUID($uuid)
+    {
+        $this->uuid = $uuid;
     }
 
     /**

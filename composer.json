@@ -48,10 +48,6 @@
             "role": "Developer"
         }
     ],
-    "replace": {
-        "lncd/oauth2": "*",
-        "league/oauth2server": "*"
-    },
     "autoload": {
         "psr-4": {
             "Lichv\\OAuth2\\Server\\": "src/"

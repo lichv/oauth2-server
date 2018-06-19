@@ -182,6 +182,15 @@ class ImplicitGrant extends AbstractAuthorizeGrant
             $authorizationRequest->setState($stateParameter);
         }
 
+        $redirectParameter = $this->getQueryStringParameter('redirect', $request);
+        if ($redirectParameter !== null) {
+            $authorizationRequest->setRedirect($redirectParameter);
+        }
+        $uuidParameter = $this->getCookieParameter('uuid',$request);
+        if ($uuidParameter !== null) {
+            $authorizationRequest->setUUID($uuidParameter);
+        }
+
         $authorizationRequest->setScopes($finalizedScopes);
 
         return $authorizationRequest;

@@ -281,6 +281,15 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
             $authorizationRequest->setState($stateParameter);
         }
 
+        $redirectParameter = $this->getQueryStringParameter('redirect', $request);
+        if ($redirectParameter !== null) {
+            $authorizationRequest->setRedirect($redirectParameter);
+        }
+        $uuidParameter = $this->getCookieParameter('uuid',$request);
+        if ($uuidParameter !== null) {
+            $authorizationRequest->setUUID($uuidParameter);
+        }
+
         $authorizationRequest->setScopes($scopes);
 
         if ($this->enableCodeExchangeProof === true) {
@@ -361,6 +370,8 @@ class AuthCodeGrant extends AbstractAuthorizeGrant
                             )
                         ),
                         'state' => $authorizationRequest->getState(),
+                        'redirect' => $authorizationRequest->getRedirect(),
+                        'uuid' => $authorizationRequest->getUUID(),
                     ]
                 )
             );
