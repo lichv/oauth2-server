@@ -33,4 +33,6 @@ interface ClientEntityInterface
      * @return string|string[]
      */
     public function getRedirectUri();
+
+    public function getExpire();
 }

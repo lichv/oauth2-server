@@ -21,6 +21,8 @@ trait ClientTrait
      */
     protected $redirectUri;
 
+    protected $expire;
+
     /**
      * Get the client's name.
      *
@@ -42,5 +44,11 @@ trait ClientTrait
     public function getRedirectUri()
     {
         return $this->redirectUri;
+    }
+
+
+    public function getExpire()
+    {
+        return $this->expire;
     }
 }

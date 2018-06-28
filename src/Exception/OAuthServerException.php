@@ -48,7 +48,7 @@ class OAuthServerException extends \Exception
      * @param null|string $hint           A helper hint
      * @param null|string $redirectUri    A HTTP URI to redirect the user back to
      */
-    public function __construct($message, $code, $errorType, $httpStatusCode = 400, $hint = null, $redirectUri = null)
+    public function __construct($message, $code, $errorType, $httpStatusCode = 200, $hint = null, $redirectUri = null)
     {
         parent::__construct($message, $code);
         $this->httpStatusCode = $httpStatusCode;
@@ -94,7 +94,7 @@ class OAuthServerException extends \Exception
         $errorMessage = 'The authorization grant type is not supported by the authorization server.';
         $hint = 'Check that all required parameters have been provided';
 
-        return new static($errorMessage, 2, 'unsupported_grant_type', 400, $hint);
+        return new static($errorMessage, 2, 'unsupported_grant_type', 200, $hint);
     }
 
     /**
@@ -111,7 +111,7 @@ class OAuthServerException extends \Exception
             'includes a parameter more than once, or is otherwise malformed.';
         $hint = ($hint === null) ? sprintf('Check the `%s` parameter', $parameter) : $hint;
 
-        return new static($errorMessage, 3, 'invalid_request', 400, $hint);
+        return new static($errorMessage, 3, 'invalid_request', 200, $hint);
     }
 
     /**
@@ -123,7 +123,7 @@ class OAuthServerException extends \Exception
     {
         $errorMessage = 'Client authentication failed';
 
-        return new static($errorMessage, 4, 'invalid_client', 401);
+        return new static($errorMessage, 4, 'invalid_client', 200);
     }
 
     /**
@@ -147,7 +147,7 @@ class OAuthServerException extends \Exception
             );
         }
 
-        return new static($errorMessage, 5, 'invalid_scope', 400, $hint, $redirectUri);
+        return new static($errorMessage, 5, 'invalid_scope', 200, $hint, $redirectUri);
     }
 
     /**
@@ -157,7 +157,7 @@ class OAuthServerException extends \Exception
      */
     public static function invalidCredentials()
     {
-        return new static('The user credentials were incorrect.', 6, 'invalid_credentials', 401);
+        return new static('The user credentials were incorrect.', 6, 'invalid_credentials', 200);
     }
 
     /**
@@ -189,7 +189,7 @@ class OAuthServerException extends \Exception
      */
     public static function invalidRefreshToken($hint = null)
     {
-        return new static('The refresh token is invalid.', 8, 'invalid_request', 401, $hint);
+        return new static('The refresh token is invalid.', 8, 'invalid_request', 200, $hint);
     }
 
     /**
