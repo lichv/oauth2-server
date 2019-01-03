@@ -9,6 +9,7 @@
 
 namespace Lichv\OAuth2\Server\Entities\Traits;
 
+use DateTime;
 use Lichv\OAuth2\Server\Entities\AccessTokenEntityInterface;
 
 trait RefreshTokenTrait
@@ -19,7 +20,12 @@ trait RefreshTokenTrait
     protected $accessToken;
 
     /**
-     * @var \DateTime
+     * @var null|string
+     */
+    protected $uuid;
+
+    /**
+     * @var DateTime
      */
     protected $expiryDateTime;
 
@@ -40,9 +46,25 @@ trait RefreshTokenTrait
     }
 
     /**
+     * @return string|null
+     */
+    public function getUUID()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function setUUID($uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
      * Get the token's expiry date time.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiryDateTime()
     {
@@ -52,9 +74,9 @@ trait RefreshTokenTrait
     /**
      * Set the date time when the token expires.
      *
-     * @param \DateTime $dateTime
+     * @param DateTime $dateTime
      */
-    public function setExpiryDateTime(\DateTime $dateTime)
+    public function setExpiryDateTime(DateTime $dateTime)
     {
         $this->expiryDateTime = $dateTime;
     }

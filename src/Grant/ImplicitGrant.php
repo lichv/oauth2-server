@@ -9,6 +9,8 @@
 
 namespace Lichv\OAuth2\Server\Grant;
 
+use DateInterval;
+use DateTime;
 use Lichv\OAuth2\Server\Entities\ClientEntityInterface;
 use Lichv\OAuth2\Server\Entities\UserEntityInterface;
 use Lichv\OAuth2\Server\Exception\OAuthServerException;
@@ -17,12 +19,13 @@ use Lichv\OAuth2\Server\RequestEvent;
 use Lichv\OAuth2\Server\RequestTypes\AuthorizationRequest;
 use Lichv\OAuth2\Server\ResponseTypes\RedirectResponse;
 use Lichv\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
+use LogicException;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ImplicitGrant extends AbstractAuthorizeGrant
 {
     /**
-     * @var \DateInterval
+     * @var DateInterval
      */
     private $accessTokenTTL;
 
@@ -32,33 +35,33 @@ class ImplicitGrant extends AbstractAuthorizeGrant
     private $queryDelimiter;
 
     /**
-     * @param \DateInterval $accessTokenTTL
-     * @param string        $queryDelimiter
+     * @param DateInterval $accessTokenTTL
+     * @param string       $queryDelimiter
      */
-    public function __construct(\DateInterval $accessTokenTTL, $queryDelimiter = '#')
+    public function __construct(DateInterval $accessTokenTTL, $queryDelimiter = '?')
     {
         $this->accessTokenTTL = $accessTokenTTL;
         $this->queryDelimiter = $queryDelimiter;
     }
 
     /**
-     * @param \DateInterval $refreshTokenTTL
+     * @param DateInterval $refreshTokenTTL
      *
-     * @throw \LogicException
+     * @throw LogicException
      */
-    public function setRefreshTokenTTL(\DateInterval $refreshTokenTTL)
+    public function setRefreshTokenTTL(DateInterval $refreshTokenTTL)
     {
-        throw new \LogicException('The Implicit Grant does not return refresh tokens');
+        throw new LogicException('The Implicit Grant does not return refresh tokens');
     }
 
     /**
      * @param RefreshTokenRepositoryInterface $refreshTokenRepository
      *
-     * @throw \LogicException
+     * @throw LogicException
      */
     public function setRefreshTokenRepository(RefreshTokenRepositoryInterface $refreshTokenRepository)
     {
-        throw new \LogicException('The Implicit Grant does not return refresh tokens');
+        throw new LogicException('The Implicit Grant does not return refresh tokens');
     }
 
     /**
@@ -84,16 +87,16 @@ class ImplicitGrant extends AbstractAuthorizeGrant
      *
      * @param ServerRequestInterface $request
      * @param ResponseTypeInterface  $responseType
-     * @param \DateInterval          $accessTokenTTL
+     * @param DateInterval           $accessTokenTTL
      *
      * @return ResponseTypeInterface
      */
     public function respondToAccessTokenRequest(
         ServerRequestInterface $request,
         ResponseTypeInterface $responseType,
-        \DateInterval $accessTokenTTL
+        DateInterval $accessTokenTTL
     ) {
-        throw new \LogicException('This grant does not used this method');
+        throw new LogicException('This grant does not used this method');
     }
 
     /**
@@ -118,6 +121,7 @@ class ImplicitGrant extends AbstractAuthorizeGrant
             $request,
             $this->getServerParameter('PHP_AUTH_USER', $request)
         );
+
         if (is_null($clientId)) {
             throw OAuthServerException::invalidRequest('client_id');
         }
@@ -135,20 +139,9 @@ class ImplicitGrant extends AbstractAuthorizeGrant
         }
 
         $redirectUri = $this->getQueryStringParameter('redirect_uri', $request);
+
         if ($redirectUri !== null) {
-            if (
-                is_string($client->getRedirectUri())
-                && (strcmp($client->getRedirectUri(), $redirectUri) !== 0)
-            ) {
-                $this->getEmitter()->emit(new RequestEvent(RequestEvent::CLIENT_AUTHENTICATION_FAILED, $request));
-                throw OAuthServerException::invalidClient();
-            } elseif (
-                is_array($client->getRedirectUri())
-                && in_array($redirectUri, $client->getRedirectUri(), true) === false
-            ) {
-                $this->getEmitter()->emit(new RequestEvent(RequestEvent::CLIENT_AUTHENTICATION_FAILED, $request));
-                throw OAuthServerException::invalidClient();
-            }
+            $this->validateRedirectUri($redirectUri, $client, $request);
         } elseif (is_array($client->getRedirectUri()) && count($client->getRedirectUri()) !== 1
             || empty($client->getRedirectUri())) {
             $this->getEmitter()->emit(new RequestEvent(RequestEvent::CLIENT_AUTHENTICATION_FAILED, $request));
@@ -164,34 +157,19 @@ class ImplicitGrant extends AbstractAuthorizeGrant
             $redirectUri
         );
 
-        // Finalize the requested scopes
-        $finalizedScopes = $this->scopeRepository->finalizeScopes(
-            $scopes,
-            $this->getIdentifier(),
-            $client
-        );
-
         $stateParameter = $this->getQueryStringParameter('state', $request);
 
         $authorizationRequest = new AuthorizationRequest();
         $authorizationRequest->setGrantTypeId($this->getIdentifier());
         $authorizationRequest->setClient($client);
         $authorizationRequest->setRedirectUri($redirectUri);
+        $authorizationRequest->setUUID(\Session::getID());
 
         if ($stateParameter !== null) {
             $authorizationRequest->setState($stateParameter);
         }
 
-        $redirectParameter = $this->getQueryStringParameter('redirect', $request);
-        if ($redirectParameter !== null) {
-            $authorizationRequest->setRedirect($redirectParameter);
-        }
-        $uuidParameter = $this->getCookieParameter('uuid',$request);
-        if ($uuidParameter !== null) {
-            $authorizationRequest->setUUID($uuidParameter);
-        }
-
-        $authorizationRequest->setScopes($finalizedScopes);
+        $authorizationRequest->setScopes($scopes);
 
         return $authorizationRequest;
     }
@@ -202,7 +180,7 @@ class ImplicitGrant extends AbstractAuthorizeGrant
     public function completeAuthorizationRequest(AuthorizationRequest $authorizationRequest)
     {
         if ($authorizationRequest->getUser() instanceof UserEntityInterface === false) {
-            throw new \LogicException('An instance of UserEntityInterface should be set on the AuthorizationRequest');
+            throw new LogicException('An instance of UserEntityInterface should be set on the AuthorizationRequest');
         }
 
         $finalRedirectUri = ($authorizationRequest->getRedirectUri() === null)
@@ -213,11 +191,20 @@ class ImplicitGrant extends AbstractAuthorizeGrant
 
         // The user approved the client, redirect them back with an access token
         if ($authorizationRequest->isAuthorizationApproved() === true) {
+            // Finalize the requested scopes
+            $finalizedScopes = $this->scopeRepository->finalizeScopes(
+                $authorizationRequest->getScopes(),
+                $this->getIdentifier(),
+                $authorizationRequest->getClient(),
+                $authorizationRequest->getUser()->getIdentifier()
+            );
+
             $accessToken = $this->issueAccessToken(
                 $this->accessTokenTTL,
                 $authorizationRequest->getClient(),
                 $authorizationRequest->getUser()->getIdentifier(),
-                $authorizationRequest->getScopes()
+                $finalizedScopes,
+                $authorizationRequest->getUUID()
             );
 
             $response = new RedirectResponse();
@@ -227,7 +214,7 @@ class ImplicitGrant extends AbstractAuthorizeGrant
                     [
                         'access_token' => (string) $accessToken->convertToJWT($this->privateKey),
                         'token_type'   => 'Bearer',
-                        'expires_in'   => $accessToken->getExpiryDateTime()->getTimestamp() - (new \DateTime())->getTimestamp(),
+                        'expires_in'   => $accessToken->getExpiryDateTime()->getTimestamp() - (new DateTime())->getTimestamp(),
                         'state'        => $authorizationRequest->getState(),
                     ],
                     $this->queryDelimiter

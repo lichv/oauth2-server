@@ -9,7 +9,9 @@
 
 namespace Lichv\OAuth2\Server\Entities;
 
-interface ScopeEntityInterface extends \JsonSerializable
+use JsonSerializable;
+
+interface ScopeEntityInterface extends JsonSerializable
 {
     /**
      * Get the scope's identifier.

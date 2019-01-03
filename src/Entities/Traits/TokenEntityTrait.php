@@ -9,6 +9,7 @@
 
 namespace Lichv\OAuth2\Server\Entities\Traits;
 
+use DateTime;
 use Lichv\OAuth2\Server\Entities\ClientEntityInterface;
 use Lichv\OAuth2\Server\Entities\ScopeEntityInterface;
 
@@ -20,7 +21,7 @@ trait TokenEntityTrait
     protected $scopes = [];
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     protected $expiryDateTime;
 
@@ -57,7 +58,7 @@ trait TokenEntityTrait
     /**
      * Get the token's expiry date time.
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getExpiryDateTime()
     {
@@ -67,9 +68,9 @@ trait TokenEntityTrait
     /**
      * Set the date time when the token expires.
      *
-     * @param \DateTime $dateTime
+     * @param DateTime $dateTime
      */
-    public function setExpiryDateTime(\DateTime $dateTime)
+    public function setExpiryDateTime(DateTime $dateTime)
     {
         $this->expiryDateTime = $dateTime;
     }
@@ -112,5 +113,25 @@ trait TokenEntityTrait
     public function setClient(ClientEntityInterface $client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * Get the client that the token was issued to.
+     *
+     * @return ClientEntityInterface
+     */
+    public function getAuthCode()
+    {
+        return $this->authCode;
+    }
+
+    /**
+     * Set the client that the token was issued to.
+     *
+     * @param ClientEntityInterface $client
+     */
+    public function setAuthCode(AuthCodeEntityInterface $authCode)
+    {
+        $this->authCode = $authCode;
     }
 }

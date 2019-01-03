@@ -11,6 +11,8 @@
 
 namespace Lichv\OAuth2\Server\Grant;
 
+use DateInterval;
+use Exception;
 use Lichv\OAuth2\Server\Exception\OAuthServerException;
 use Lichv\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use Lichv\OAuth2\Server\RequestEvent;
@@ -29,7 +31,7 @@ class RefreshTokenGrant extends AbstractGrant
     {
         $this->setRefreshTokenRepository($refreshTokenRepository);
 
-        $this->refreshTokenTTL = new \DateInterval('P1M');
+        $this->refreshTokenTTL = new DateInterval('P1M');
     }
 
     /**
@@ -38,7 +40,7 @@ class RefreshTokenGrant extends AbstractGrant
     public function respondToAccessTokenRequest(
         ServerRequestInterface $request,
         ResponseTypeInterface $responseType,
-        \DateInterval $accessTokenTTL
+        DateInterval $accessTokenTTL
     ) {
         // Validate request
         $client = $this->validateClient($request);
@@ -63,7 +65,7 @@ class RefreshTokenGrant extends AbstractGrant
 
         // Issue and persist new tokens
         $accessToken = $this->issueAccessToken($accessTokenTTL, $client, $oldRefreshToken['user_id'], $scopes);
-        $refreshToken = $this->issueRefreshToken($accessToken);
+        $refreshToken = $this->issueRefreshToken($accessToken, $client);
 
         // Send events to emitter
         $this->getEmitter()->emit(new RequestEvent(RequestEvent::ACCESS_TOKEN_ISSUED, $request));
@@ -94,8 +96,8 @@ class RefreshTokenGrant extends AbstractGrant
         // Validate refresh token
         try {
             $refreshToken = $this->decrypt($encryptedRefreshToken);
-        } catch (\Exception $e) {
-            throw OAuthServerException::invalidRefreshToken('Cannot decrypt the refresh token');
+        } catch (Exception $e) {
+            throw OAuthServerException::invalidRefreshToken('Cannot decrypt the refresh token', $e);
         }
 
         $refreshTokenData = json_decode($refreshToken, true);

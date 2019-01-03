@@ -14,14 +14,43 @@ trait ClientTrait
     /**
      * @var string
      */
+    protected $key;
+
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var integer
+     */
+    protected $expire;
+
+    /**
+     * @var integer
+     */
+    protected $refresh_expire;
+
+    /**
+     * @var integer
+     */
+    protected $silence;
 
     /**
      * @var string|string[]
      */
     protected $redirectUri;
 
-    protected $expire;
+    /**
+     * Get the client's key.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
 
     /**
      * Get the client's name.
@@ -35,6 +64,39 @@ trait ClientTrait
     }
 
     /**
+     * Get the client's expire.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getExpire()
+    {
+        return $this->expire;
+    }
+
+    /**
+     * Get the client's refresh_expire.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getRefreshExpire()
+    {
+        return $this->refresh_expire;
+    }
+
+    /**
+     * Get the client's silence.
+     *
+     * @return string
+     * @codeCoverageIgnore
+     */
+    public function getSilence()
+    {
+        return $this->silence;
+    }
+
+    /**
      * Returns the registered redirect URI (as a string).
      *
      * Alternatively return an indexed array of redirect URIs.
@@ -44,11 +106,5 @@ trait ClientTrait
     public function getRedirectUri()
     {
         return $this->redirectUri;
-    }
-
-
-    public function getExpire()
-    {
-        return $this->expire;
     }
 }

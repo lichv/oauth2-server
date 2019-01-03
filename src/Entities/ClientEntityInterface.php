@@ -26,6 +26,27 @@ interface ClientEntityInterface
     public function getName();
 
     /**
+     * Get the client's expire.
+     *
+     * @return string
+     */
+    public function getExpire();
+
+    /**
+     * Get the client's expire.
+     *
+     * @return string
+     */
+    public function getRefreshExpire();
+
+    /**
+     * Get the client's silence.
+     *
+     * @return string
+     */
+    public function getSilence();
+
+    /**
      * Returns the registered redirect URI (as a string).
      *
      * Alternatively return an indexed array of redirect URIs.
@@ -33,6 +54,4 @@ interface ClientEntityInterface
      * @return string|string[]
      */
     public function getRedirectUri();
-
-    public function getExpire();
 }

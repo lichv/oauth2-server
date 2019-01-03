@@ -11,6 +11,7 @@
 
 namespace Lichv\OAuth2\Server\ResponseTypes;
 
+use DateTime;
 use Lichv\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use Lichv\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -28,7 +29,7 @@ class BearerTokenResponse extends AbstractResponseType
 
         $responseParams = [
             'token_type'   => 'Bearer',
-            'expires_in'   => $expireDateTime - (new \DateTime())->getTimestamp(),
+            'expires_in'   => $expireDateTime - (new DateTime())->getTimestamp(),
             'access_token' => (string) $jwtAccessToken,
         ];
 

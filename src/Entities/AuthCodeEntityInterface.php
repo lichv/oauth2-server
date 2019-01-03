@@ -20,4 +20,14 @@ interface AuthCodeEntityInterface extends TokenInterface
      * @param string $uri
      */
     public function setRedirectUri($uri);
+
+    /**
+     * @return string|null
+     */
+    public function getUUID();
+
+    /**
+     * @param string $uuid
+     */
+    public function setUUID($uuid);
 }

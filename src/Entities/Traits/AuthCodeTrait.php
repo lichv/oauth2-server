@@ -17,6 +17,11 @@ trait AuthCodeTrait
     protected $redirectUri;
 
     /**
+     * @var null|string
+     */
+    protected $uuid;
+
+    /**
      * @return string|null
      */
     public function getRedirectUri()
@@ -30,5 +35,21 @@ trait AuthCodeTrait
     public function setRedirectUri($uri)
     {
         $this->redirectUri = $uri;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUUID()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function setUUID($uuid)
+    {
+        $this->uuid = $uuid;
     }
 }

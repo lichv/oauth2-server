@@ -5,6 +5,6 @@ includes:
 	- vendor/phpstan/phpstan-strict-rules/rules.neon
 services:
 	-
-		class: LeagueTests\PHPStan\AbstractGrantExtension
+		class: LichvTests\PHPStan\AbstractGrantExtension
 		tags:
 			- phpstan.broker.dynamicMethodReturnTypeExtension

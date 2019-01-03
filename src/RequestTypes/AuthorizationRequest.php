@@ -64,10 +64,11 @@ class AuthorizationRequest
      */
     protected $state;
 
-
-    protected $redirect;
-
-
+    /**
+     * The uuid parameter on the authorization request
+     *
+     * @var string|null
+     */
     protected $uuid;
 
     /**
@@ -199,29 +200,13 @@ class AuthorizationRequest
     /**
      * @return string|null
      */
-    public function getRedirect()
-    {
-        return $this->redirect;
-    }
-
-    /**
-     * @param string $state
-     */
-    public function setRedirect($redirect)
-    {
-        $this->redirect = $redirect;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getUUID()
     {
         return $this->uuid;
     }
 
     /**
-     * @param string $state
+     * @param string|null $redirectUri
      */
     public function setUUID($uuid)
     {

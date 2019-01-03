@@ -46,8 +46,6 @@ interface AccessTokenRepositoryInterface extends RepositoryInterface
      */
     public function revokeAccessToken($tokenId);
 
-    public function revokeAccessTokenByUUID($uuid);
-
     /**
      * Check if the access token has been revoked.
      *

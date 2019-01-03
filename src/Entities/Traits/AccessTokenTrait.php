@@ -9,6 +9,7 @@
 
 namespace Lichv\OAuth2\Server\Entities\Traits;
 
+use DateTime;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
@@ -19,6 +20,11 @@ use Lichv\OAuth2\Server\Entities\ScopeEntityInterface;
 
 trait AccessTokenTrait
 {
+    /**
+     * @var null|string
+     */
+    protected $uuid;
+
     /**
      * Generate a JWT from the access token
      *
@@ -46,7 +52,7 @@ trait AccessTokenTrait
     abstract public function getClient();
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     abstract public function getExpiryDateTime();
 
@@ -59,4 +65,20 @@ trait AccessTokenTrait
      * @return ScopeEntityInterface[]
      */
     abstract public function getScopes();
+
+    /**
+     * @return string|null
+     */
+    public function getUUID()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function setUUID($uuid)
+    {
+        $this->uuid = $uuid;
+    }
 }
