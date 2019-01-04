@@ -494,10 +494,8 @@ abstract class AbstractGrant implements GrantTypeInterface
         $refresh_expire = $client->getRefreshExpire();
 
         if(!empty($refresh_expire)){
-            \Log::info(__FILE__.' '.__FUNCTION__.' '.__LINE__,['refresh_expire'=>$refresh_expire,'now'=>(now()->addMinutes($refresh_expire))]);
             $refreshToken->setExpiryDateTime(now()->addMinutes($refresh_expire));
         }else{
-            \Log::info(__FILE__.' '.__FUNCTION__.' '.__LINE__,['refresh_expire'=>$refresh_expire,'now'=>(new DateTime())->add($this->refreshTokenTTL)]);
             $refreshToken->setExpiryDateTime((new DateTime())->add($this->refreshTokenTTL));
         }
 
